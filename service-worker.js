@@ -1,18 +1,27 @@
-const CACHE_NAME = 'macro-tracker-v1';
+const CACHE_NAME = 'macro-tracker-v5-final';
 const ASSETS = [
   './',
   './index.html',
   './composeApp.js',
   './composeApp.wasm',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png'
+  './manifest.webmanifest'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Force the new service worker to take over immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
+    })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      );
     })
   );
 });
